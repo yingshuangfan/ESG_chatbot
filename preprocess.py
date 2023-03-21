@@ -2,7 +2,7 @@
 from PyPDF2 import PdfReader
  
 def extract_pdf(input_path, output_path):
-    with open(output_path, "w", encoding="utf8") as out:
+    with open(output_path, "w", encoding="utf8") as fp:
         try:
             reader = PdfReader(input_path)
             print(f"start parsing file: {input_path}, total {len(reader.pages)} pages.")
@@ -10,14 +10,15 @@ def extract_pdf(input_path, output_path):
                 
                 parts = []
                 def visitor_body(text, cm, tm, font_dict, font_size):
+                    """customized text-block parser"""
                     y = tm[5]
-                    if y > 50 and y < 720:  # igore header and footer
-                        parts.append(text.strip() + " ")  # insert line-break
+                    if y > 50 and y < 720:     # ignore header and footer
+                        parts.append(text.strip())
             
-
                 page.extract_text(visitor_text=visitor_body)
-                text_body = "".join(parts)
-                out.write(text_body + "\n\n")   # insert page-break
+                text_body = " ".join(parts)    # insert line-break
+                fp.write(text_body + "\n\n")   # insert page-break
+
         except Exception as err:
             print(f"failed to parse PDF {input_path} with error: {err}")
 
