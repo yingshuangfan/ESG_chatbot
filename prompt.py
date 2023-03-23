@@ -1,9 +1,11 @@
 """
 Generates prompt questions and answers with BERT
+reference: https://huggingface.co/docs/transformers/v4.27.2/en/tasks/question_answering#inference
 """
 import json
 from datasets import load_dataset
 from transformers import AutoTokenizer, AutoModelForQuestionAnswering, TrainingArguments, Trainer
+from transformers import BertForQuestionAnswering, BertTokenizer
 from transformers import pipeline
 
 def load_sample_data(n_samples=100):
@@ -34,8 +36,11 @@ def fine_tune():
 def inference(question, context):
     """generate answer given question and context"""
     # reference: https://huggingface.co/distilbert-base-cased-distilled-squad
-    tokenizer = AutoTokenizer.from_pretrained("distilbert-base-cased-distilled-squad")
-    model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-cased-distilled-squad")
+    # tokenizer = AutoTokenizer.from_pretrained("distilbert-base-cased-distilled-squad")
+    # model = AutoModelForQuestionAnswering.from_pretrained("distilbert-base-cased-distilled-squad")
+    checkpoint = "bert-large-uncased-whole-word-masking-finetuned-squad"
+    tokenizer = BertTokenizer.from_pretrained(checkpoint)
+    model = BertForQuestionAnswering.from_pretrained(checkpoint)
 
     agent = pipeline("question-answering", model=model, tokenizer=tokenizer)
     answer = agent(question=question, context=context)
