@@ -1,5 +1,7 @@
 import os
 import re
+import argparse
+
 import tqdm
 import textract
 from PyPDF2 import PdfReader
@@ -67,16 +69,23 @@ def preprocess_txt_doc(input_path, output_path):
     output_txt.close()
 
 
-def main(input_path, output_path):
-    extract_pdf_using_textract(input_path, output_path="temp1.txt")
-    preprocess_txt_doc(input_path="temp1.txt", output_path="temp2.txt")
-    extract_important_paragraph(input_path="temp2.txt", output_path=output_path)
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data_dir", default="data/", type=str, required=True,
+                        help="original raw files(in PDF format)")
+    parser.add_argument("--output_dir", default="output/", type=str, required=True,
+                        help="pre-processed files(in text format)")
+    args = parser.parse_args()
+    
+    for file in tqdm.tqdm(os.listdir(args.data_dir)):
+        input_path = os.path.join(args.data_dir, file)
+        output_path = os.path.join(args.output_dir, file.split(".")[0]+".txt")
+        # main(input_path, output_path)
+
+        extract_pdf_using_textract(input_path, output_path="temp1.txt")
+        preprocess_txt_doc(input_path="temp1.txt", output_path="temp2.txt")
+        extract_important_paragraph(input_path="temp2.txt", output_path=output_path)
 
 
 if __name__ == "__main__":
-    dataset_dir = "data/"
-    output_dir = "output/"
-    for file in tqdm.tqdm(os.listdir(dataset_dir)):
-        input_path = os.path.join(dataset_dir, file)
-        output_path = os.path.join(output_dir, file.split(".")[0]+".txt")
-        main(input_path, output_path)
+    main()
