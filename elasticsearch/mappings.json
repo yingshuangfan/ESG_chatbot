@@ -1,0 +1,30 @@
+{
+    "settings": {
+        "index": {
+            "number_of_shards": 1,  
+            "number_of_replicas": 0 
+        }
+    },
+    "mappings": {
+        "_source": {
+            "excludes": [
+                "vector"
+            ]
+        },
+      "properties": {
+            "vector": {
+                "type": "dense_vector",
+                "dims": 768,
+                "index": true,
+                "similarity": "dot_product"
+            },
+            "title": {
+                "type": "text"
+            },
+            "paragraph": {
+                "type": "text"
+            }
+      }
+    }
+}
+  

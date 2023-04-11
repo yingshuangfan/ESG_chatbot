@@ -68,6 +68,17 @@ def preprocess_txt_doc(input_path, output_path):
     fp.close()
     output_txt.close()
 
+def reformat_es(input_path):
+    """genereate elasticsearch index format file"""
+    with open(input_path, "r", encoding="utf8") as fp:
+        data = [line.strip() for line in fp.readlines()]
+
+    company_name = input_path.replace(".txt", "").split("/")[-1]
+    output_path = input_path.replace(".txt", ".tsv")
+    with open(output_path, "w", encoding="utf8") as fp:
+        for line in data:
+            fp.write(f"{company_name}\t{line}\n")
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -75,16 +86,19 @@ def main():
                         help="original raw files(in PDF format)")
     parser.add_argument("--output_dir", default="output/", type=str, required=True,
                         help="pre-processed files(in text format)")
+    parser.add_argument("--to_es", default=True, type=bool, required=False,
+                        help="generate es formatted files(in tsv format)")
     args = parser.parse_args()
     
     for file in tqdm.tqdm(os.listdir(args.data_dir)):
         input_path = os.path.join(args.data_dir, file)
         output_path = os.path.join(args.output_dir, file.split(".")[0]+".txt")
-        # main(input_path, output_path)
 
         extract_pdf_using_textract(input_path, output_path="temp1.txt")
         preprocess_txt_doc(input_path="temp1.txt", output_path="temp2.txt")
         extract_important_paragraph(input_path="temp2.txt", output_path=output_path)
+        if args.to_es:
+            reformat_es(input_path=output_path)
 
 
 if __name__ == "__main__":
