@@ -70,14 +70,28 @@ def preprocess_txt_doc(input_path, output_path):
 
 def reformat_es(input_path):
     """genereate elasticsearch index format file"""
-    with open(input_path, "r", encoding="utf8") as fp:
-        data = [line.strip() for line in fp.readlines()]
-
-    company_name = input_path.replace(".txt", "").split("/")[-1]
+    # file name format = <company name> + _ + <type,timestamp> + .txt
+    file_name = input_path.replace(".txt", "").split("/")[-1]
+    company_name = file_name.split("_")[0]
     output_path = input_path.replace(".txt", ".tsv")
+
+    with open(input_path, "r", encoding="utf8") as fp:
+        data = [to_third_person(line.strip(), company_name) for line in fp.readlines()]
+
     with open(output_path, "w", encoding="utf8") as fp:
         for line in data:
             fp.write(f"{company_name}\t{line}\n")
+
+
+def to_third_person(sentence, entity):
+    """change the sentence into third person"""
+    result = sentence.split(" ")
+    for i, word in enumerate(result):
+        if word.lower() in ["i", "me", "myself", "we", "ourself", "ourselves"]:
+            result[i] = entity
+        elif word.lower() in ["my", "our", "ours", "mine"]:
+            result[i] = f"{entity}'s"
+    return " ".join(result)
 
 
 def main():

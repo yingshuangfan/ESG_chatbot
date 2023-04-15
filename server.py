@@ -43,6 +43,9 @@ def main():
         long_response = inference_long(concat_context)
         print(long_response)
         print(f'long summary take {time.time() - start}s')
+
+        #TODO alternative: PARAPHRASE
+        #https://huggingface.co/humarin/chatgpt_paraphraser_on_T5_base
     
 
 

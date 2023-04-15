@@ -21,12 +21,22 @@ SQuAD training data samples format:
 ```
 
 ## Run API-Server with ES
+
+
 ```bash
+# preprocessing
+python preprocess.py --data_dir ../data --output_dir ./data --to_es true
+
+# start elasticsearch single-node
 cd elasticsearch
 docker-compose up -d
+
 # create index
-python index.py <lang> <data_file> <index_name>
+curl -X PUT -H "Content-Type: application/json" -d @mappings.json http://localhost:9200/test-index
+python index.py en ../data/HSBC_HK_ESG_2022.tsv test-index
+
 # start query server
-python query.py 
+cd ..
+python server.py 
 ```
 
