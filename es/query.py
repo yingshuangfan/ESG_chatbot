@@ -5,8 +5,6 @@ import time
 
 import numpy as np
 import rocketqa
-from elasticsearch import Elasticsearch
-
 
 class Querier:
     def __init__(self, es_client, index_name, de_model, ce_model):
@@ -69,30 +67,3 @@ class Querier:
             for i, score in enumerate(ranking_score)
         ]
         return sorted(answers, key=lambda a: a['score'], reverse=True)
-
-
-def main():
-    print(rocketqa.available_models())
-
-    es_client = Elasticsearch(
-        "http://localhost:9200",
-        verify_certs=False,
-    )
-    querier = Querier(es_client, "test-index", "v1_marco_de", "v1_marco_ce")
-
-    while True:
-        query = input('Query: ')
-
-        candidates = querier.search(query)
-        print('Candidates:')
-        for c in candidates:
-            print(c['title'], '\t', c['para'])
-
-        answers = querier.sort(query, candidates)
-        print('Answers:')
-        for a in answers:
-            print(a['title'], '\t', a['para'], '\t', a['score'])
-
-
-if __name__ == '__main__':
-    main()

@@ -13,7 +13,8 @@ def inference(text):
     tokenizer = AutoTokenizer.from_pretrained(checkpoint)
     model = AutoModelForSeq2SeqLM.from_pretrained(checkpoint)
     agent = pipeline("summarization", model=model, tokenizer=tokenizer)
-    return agent(f"summarize: {text}")
+    summary = agent(f"summarize: {text}")
+    return summary[0]["summary_text"]
 
 def inference_long(text):
     checkpoint = "pszemraj/led-base-book-summary"
@@ -29,7 +30,7 @@ def inference_long(text):
            do_sample=False,
            early_stopping=True,
     )
-    return summary
+    return summary[0]["summary_text"]
 
 
 def test_bill():
