@@ -22,7 +22,6 @@ SQuAD training data samples format:
 
 ## Run API-Server with ES
 
-
 ```bash
 # preprocessing
 python preprocess.py --data_dir ../data --output_dir ./data --to_es true
@@ -40,3 +39,11 @@ cd ..
 python server.py 
 ```
 
+## Create GPU environment in GPU-farm (on-going)
+
+```bash
+conda create -n esg-chatbot python=3.8
+conda activate esg-chatbot
+
+pip install paddlepaddle-gpu
+```
