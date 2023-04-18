@@ -68,6 +68,31 @@ def preprocess_txt_doc(input_path, output_path):
     fp.close()
     output_txt.close()
 
+def reformat_es(input_path):
+    """genereate elasticsearch index format file"""
+    # file name format = <company name> + _ + <type,timestamp> + .txt
+    file_name = input_path.replace(".txt", "").split("/")[-1]
+    company_name = file_name.split("_")[0]
+    output_path = input_path.replace(".txt", ".tsv")
+
+    with open(input_path, "r", encoding="utf8") as fp:
+        data = [to_third_person(line.strip(), company_name) for line in fp.readlines()]
+
+    with open(output_path, "w", encoding="utf8") as fp:
+        for line in data:
+            fp.write(f"{company_name}\t{line}\n")
+
+
+def to_third_person(sentence, entity):
+    """change the sentence into third person"""
+    result = sentence.split(" ")
+    for i, word in enumerate(result):
+        if word.lower() in ["i", "me", "myself", "we", "ourself", "ourselves"]:
+            result[i] = entity
+        elif word.lower() in ["my", "our", "ours", "mine"]:
+            result[i] = f"{entity}'s"
+    return " ".join(result)
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -75,16 +100,19 @@ def main():
                         help="original raw files(in PDF format)")
     parser.add_argument("--output_dir", default="output/", type=str, required=True,
                         help="pre-processed files(in text format)")
+    parser.add_argument("--to_es", default=True, type=bool, required=False,
+                        help="generate es formatted files(in tsv format)")
     args = parser.parse_args()
     
     for file in tqdm.tqdm(os.listdir(args.data_dir)):
         input_path = os.path.join(args.data_dir, file)
         output_path = os.path.join(args.output_dir, file.split(".")[0]+".txt")
-        # main(input_path, output_path)
 
         extract_pdf_using_textract(input_path, output_path="temp1.txt")
         preprocess_txt_doc(input_path="temp1.txt", output_path="temp2.txt")
         extract_important_paragraph(input_path="temp2.txt", output_path=output_path)
+        if args.to_es:
+            reformat_es(input_path=output_path)
 
 
 if __name__ == "__main__":

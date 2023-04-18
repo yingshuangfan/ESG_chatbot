@@ -1,0 +1,9 @@
+version: "3.9"
+services:
+  elasticsearch:
+    image: elasticsearch:8.4.2
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - ./config.yml:/usr/share/elasticsearch/config/elasticsearch.yml
