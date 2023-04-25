@@ -24,7 +24,7 @@ SQuAD training data samples format:
 
 ```bash
 # preprocessing
-python preprocess.py --data_dir ../data --output_dir ./data --to_es true
+python preprocess.py --data_dir ./data/PDF --output_dir ./data/TXT --to_es true
 
 # start elasticsearch single-node
 cd elasticsearch

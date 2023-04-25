@@ -68,11 +68,31 @@ def preprocess_txt_doc(input_path, output_path):
     fp.close()
     output_txt.close()
 
+def parse_company_name(file_name):
+    names = []
+    # print(file_name, re.split('-|_| ', file_name.replace("_", " ")))
+    for name in re.split('-|_| ', file_name.replace("_", " ")):
+        if name.upper() in ["ESG", "SR", "AR", "CSR", "REPORT", "APPENDIX"]:
+            continue
+        if name.upper().endswith(("PDF", "TXT", "TSV")):
+            continue
+        try:
+            val = int(name)
+            if val > 2000:
+                continue
+        except ValueError as err:
+            pass
+
+        name = name[0].upper() + name[1:] if len(name) > 1 else name.upper()
+        names.append(name)
+    company_name = "_".join(names)
+    return company_name
+
 def reformat_es(input_path):
     """genereate elasticsearch index format file"""
     # file name format = <company name> + _ + <type,timestamp> + .txt
     file_name = input_path.replace(".txt", "").split("/")[-1]
-    company_name = file_name.split("_")[0]
+    company_name = parse_company_name(file_name)
     output_path = input_path.replace(".txt", ".tsv")
 
     with open(input_path, "r", encoding="utf8") as fp:
