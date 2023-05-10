@@ -33,7 +33,7 @@ class Querier:
         vector = vector / np.linalg.norm(vector)
         return vector
 
-    def search(self, query, topk=10):
+    def search(self, query, title="", topk=10):
         vector = self.encode(query)
         knn = dict(
             field="vector",
@@ -41,7 +41,8 @@ class Querier:
             k=topk,
             num_candidates=100,
         )
-        result = self.es_client.knn_search(index=self.index_name, knn=knn)
+        query_dsl = {"match":{"title":{"query":title}}} if title else {"match_all":{}}
+        result = self.es_client.knn_search(index=self.index_name, knn=knn, filter=query_dsl)
 
         candidates = [
             dict(

@@ -19,10 +19,11 @@ def inference(text):
 def inference_long(text):
     checkpoint = "pszemraj/led-base-book-summary"
     agent = pipeline("summarization", checkpoint)
+    tokens_num = len(text.split(" "))
     summary = agent(
            text,
            min_length=8, 
-           max_length=512,
+           max_length=min(512, round(tokens_num * 0.8)),
            no_repeat_ngram_size=3, 
            encoder_no_repeat_ngram_size=3,
            repetition_penalty=3.5,

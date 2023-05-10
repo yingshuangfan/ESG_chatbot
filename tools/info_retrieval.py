@@ -1,6 +1,6 @@
 import rocketqa
 import time
-from summarize import inference_long, inference
+from utils.summarize import inference_long, inference
 
 query = "reduce emissions"  # topic query
 

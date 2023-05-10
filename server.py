@@ -1,53 +1,45 @@
 import time
+import logging
+import argparse
+logging.basicConfig(level=logging.ERROR)
 
 from elasticsearch import Elasticsearch
 
 from es.query import Querier
-# from generator import inference
-from summarize import inference, inference_long
+# from utils.generator import inference
+from utils.summarize import inference, inference_long
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--es_server", default="http://localhost:9200", type=str, required=True,
+                        help="Elasticsearch service address")
+    parser.add_argument("--es_index", default="test-index", type=str, required=True,
+                        help="Elasticsearch index with stored dataset")
+    parser.add_argument("--top_n", default=3, type=str, required=True,
+                        help="Top-N KNN arguments will be selected")
+    args = parser.parse_args()
     
     es_client = Elasticsearch(
-        "http://localhost:9200",
+        args.es_server,
         verify_certs=False,
     )
-    querier = Querier(es_client, "test-index", "v1_marco_de", "v1_marco_ce")
+    querier = Querier(es_client, args.es_index, "v1_marco_de", "v1_marco_ce")
 
-    top_n = 3
+    top_n = args.top_n
     while True:
         query = input('Query: ')
 
-        start = time.time()
-        candidates = querier.search(query)
-        # print('Candidates:')
-        # for c in candidates:
-        #     print(c['title'], '\t', c['para'])
+        candidates = querier.search(query, topk=top_n)
 
         answers = querier.sort(query, candidates)[:top_n]
-        print('Answers:')
-        for a in answers:
-            print(a['title'], '\t', a['para'], '\t', a['score'])
-        print(f'search take {time.time() - start}s')
 
-        start = time.time()
-        print('Generated Answer:')
         concat_context = "\n".join([a['para'] for a in answers])
-        # response = inference(question=query, title=a['title'], context=concat_context)
-        response = inference(concat_context)
-        print(response)
-        print(f'summary take {time.time() - start}s')
 
-        start = time.time()
-        print('Generated Long Answer:')
+        print('Answer:')
         long_response = inference_long(concat_context)
         print(long_response)
-        print(f'long summary take {time.time() - start}s')
-
-        #TODO alternative: PARAPHRASE
-        #https://huggingface.co/humarin/chatgpt_paraphraser_on_T5_base
     
 
 
 if __name__ == '__main__':
-    main()
+    main() 
