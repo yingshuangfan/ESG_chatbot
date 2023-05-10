@@ -1,45 +1,45 @@
-# ESG_chatbot
+# ESG ConsultBot
 Group course work for ARIN7102 (HKU 2023)
 
-## Pre-Processing
+## Create Environment
 
-See more in the official document API:
-https://pypdf2.readthedocs.io/en/stable/modules/PageObject.html#pypdf._page.PageObject.extract_text
-
-## Summarization
-
-
-## Prompting
-
-See more about Question-Answering by hugging-face:
-https://huggingface.co/docs/transformers/v4.27.2/en/tasks/question_answering#question-answering
-
-SQuAD training data samples format:
-
-```json
-{"id": "5733be284776f41900661182", "title": "University_of_Notre_Dame", "context": "Architecturally, the school has a Catholic character. Atop the Main Building\"s gold dome is a golden statue of the Virgin Mary. Immediately in front of the Main Building and facing it, is a copper statue of Christ with arms upraised with the legend \"Venite Ad Me Omnes\". Next to the Main Building is the Basilica of the Sacred Heart. Immediately behind the basilica is the Grotto, a Marian place of prayer and reflection. It is a replica of the grotto at Lourdes, France where the Virgin Mary reputedly appeared to Saint Bernadette Soubirous in 1858. At the end of the main drive (and in a direct line that connects through 3 statues and the Gold Dome), is a simple, modern stone statue of Mary.", "question": "To whom did the Virgin Mary allegedly appear in 1858 in Lourdes France?", "answers": {"text": ["Saint Bernadette Soubirous"], "answer_start": [515]}}
+```bash
+conda env create -f environment.yml
 ```
 
 ## Run API-Server with ES
 
+1. run preprocessing
 ```bash
-# preprocessing
 python preprocess.py --data_dir ./data/PDF --output_dir ./data/TXT --to_es true
+```
 
-# start elasticsearch single-node
+2. start an elasticsearch single-node (with Docker)
+```bash
 cd elasticsearch
 docker-compose up -d
+```
 
-# create index
+3. create an index mapping, then start word embedding and the build local database
+```bash
 curl -X PUT -H "Content-Type: application/json" -d @mappings.json http://localhost:9200/test-index
 python index.py en ../data/HSBC_HK_ESG_2022.tsv test-index
+```
 
-# start query server
+4. all set! start the qa-cli(server)
+```bash
 cd ..
 python server.py 
 ```
 
-## Create GPU environment in GPU-farm (on-going)
+## Example Results
+
+```log
+Q: What did Adidas do in greenhouse gas emissions?
+A: Adidas' estimated environmental impact for 2021 is split equally among the various value chain segments. For example, sourcing and processing are both significant sources of greenhouse gas (GHG) emissions; however, raw materials management is a significant source of GHG. In order to effectively manage these multiple sources of CO2s, Adidas plans to invest roughly 90% of its annual revenue in "sustainable processes."
+```
+
+## Create GPU environment in GPU-farm
 
 ```bash
 conda create -n esg-chatbot python=3.8
