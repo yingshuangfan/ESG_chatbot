@@ -21,6 +21,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_dir", default="data/", type=str, required=True,
                         help="original raw files(in PDF format)")
+    parser.add_argument("--es_server", default="http://localhost:9200", type=str, required=True,
+                        help="Elasticsearch service address")
+    parser.add_argument("--es_index", default="test-index", type=str, required=True,
+                        help="Elasticsearch index with stored dataset")
+    parser.add_argument("--top_n", default=3, type=str, required=True,
+                        help="Top-N KNN arguments will be selected")
     args = parser.parse_args()
 
     companies = []
@@ -32,11 +38,11 @@ def main():
     print(companies)
 
     es_client = Elasticsearch(
-        "http://localhost:9200",
+        args.es_server,
         verify_certs=False,
     )
-    querier = Querier(es_client, "test-index-v3", "v1_marco_de", "v1_marco_ce")
-    top_n = 3
+    querier = Querier(es_client, args.es_index, "v1_marco_de", "v1_marco_ce")
+    top_n = args.top_n
 
     for company in companies:
         outputs = []

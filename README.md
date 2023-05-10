@@ -34,10 +34,9 @@ python server.py
 
 ## Example Results
 
-```log
-Q: What did Adidas do in greenhouse gas emissions?
-A: Adidas' estimated environmental impact for 2021 is split equally among the various value chain segments. For example, sourcing and processing are both significant sources of greenhouse gas (GHG) emissions; however, raw materials management is a significant source of GHG. In order to effectively manage these multiple sources of CO2s, Adidas plans to invest roughly 90% of its annual revenue in "sustainable processes."
-```
+**Q:** What did Adidas do in greenhouse gas emissions?
+
+**A:** Adidas' estimated environmental impact for 2021 is split equally among the various value chain segments. For example, sourcing and processing are both significant sources of greenhouse gas (GHG) emissions; however, raw materials management is a significant source of GHG. In order to effectively manage these multiple sources of CO2s, Adidas plans to invest roughly 90% of its annual revenue in "sustainable processes."
 
 ## Create GPU environment in GPU-farm
 

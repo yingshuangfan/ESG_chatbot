@@ -1,5 +1,6 @@
 import time
 import logging
+import argparse
 logging.basicConfig(level=logging.ERROR)
 
 from elasticsearch import Elasticsearch
@@ -9,14 +10,22 @@ from es.query import Querier
 from utils.summarize import inference, inference_long
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--es_server", default="http://localhost:9200", type=str, required=True,
+                        help="Elasticsearch service address")
+    parser.add_argument("--es_index", default="test-index", type=str, required=True,
+                        help="Elasticsearch index with stored dataset")
+    parser.add_argument("--top_n", default=3, type=str, required=True,
+                        help="Top-N KNN arguments will be selected")
+    args = parser.parse_args()
     
     es_client = Elasticsearch(
-        "http://localhost:9200",
+        args.es_server,
         verify_certs=False,
     )
-    querier = Querier(es_client, "test-index-v3", "v1_marco_de", "v1_marco_ce")
+    querier = Querier(es_client, args.es_index, "v1_marco_de", "v1_marco_ce")
 
-    top_n = 3
+    top_n = args.top_n
     while True:
         query = input('Query: ')
 
